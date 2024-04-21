@@ -27,28 +27,21 @@ class Window(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    feat_dict = {"Phoenix": "Phoenix Shift", 
-                "Garuda": "Deadly Embrace",
-                "Ramuh": "Blind Justice",
-                "Titan": "Titanic Block",
-                "Bahamut": "Wings of Light",
-                "Shiva": "Cold Snap",
-                "Odin": "Arm of Darkness",
-                "Leviathan": "Serpent's Cry",
-                "Ultima": "Ascension"
-                }
+    feat_dict = {}
+    ability_dict = {}
+    eikons = ["Ifrit", "Phoenix", "Garuda", "Ramuh", "Titan", "Bahamut", "Shiva", "Odin", "Leviathan", "Ultima"]
 
-    ability_dict = {"Ifrit": ["Will o' the Wykes", "Ignition"],
-                    "Phoenix": ["Rising Flames", "Heatwave", "Flames of Rebirth", "Scarlet Cyclone"],
-                    "Garuda": ["Gouge", "Wicked Wheel", "Rook's Gambit", "Aerial Blast"],
-                    "Ramuh": ["Thunderstorm", "Judgement Bolt", "Lightning Rod", "Pile Drive"],
-                    "Titan": ["Upheavel", "Raging Fists", "Windup", "Earthen Fury"],
-                    "Bahamut": ["Flare Breath", "Impulse", "Satellite", "Gigaflare"],
-                    "Shiva": ["Diamond Dust", "Rime", "Ice Age", "Mesmerize"],
-                    "Odin": ["Gungnir", "Heaven's Cloud", "Rift Slip", "Dancing Steel"],
-                    "Leviathan": ["Deluge", "Abyssal Tear", "Tsunami", "Cross Swell"],
-                    "Ultima": ["Dominion", "Proselytize", "Voice of God", "Ultimate Demise"]
-                    }
+    count = 1
+    with open("feats_and_abilities.txt", "r") as f:
+        lines = f.readlines()
+        for eikon in eikons:
+            if eikon == "Ifrit":
+                ability_dict[eikons[0]] = lines[0].strip("\n").split(",")
+            else:
+                feat_dict[eikon] = lines[count].strip("\n")
+                ability_dict[eikon] = lines[count+1].strip("\n").split(",")
+                count += 2
+    f.close()
 
     randomizer = LoadoutRandomizer(feat_dict, ability_dict)
 
