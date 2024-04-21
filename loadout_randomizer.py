@@ -1,14 +1,15 @@
+import copy
 from random import *
 
 class LoadoutRandomizer():
     def __init__(self, feat_dict, ability_dict, parent=None):
         self.feat_dict = feat_dict
         self.ability_dict = ability_dict
-        self.temp_ability_dict = ability_dict
+        self.temp_ability_dict = copy.deepcopy(self.ability_dict)
 
     def randomize(self):
         loadout = {}
-        
+
         # choose 3 random feats
         feat_set = sample(list(self.feat_dict.values()), 3)
 
@@ -18,7 +19,7 @@ class LoadoutRandomizer():
 
             loadout[feat] = [ability_one, ability_two]
         
-        self.temp_ability_dict = self.ability_dict
+        self.temp_ability_dict = copy.deepcopy(self.ability_dict)
 
         return loadout
 
