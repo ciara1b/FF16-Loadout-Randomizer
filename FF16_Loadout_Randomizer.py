@@ -1,4 +1,5 @@
 from random import *
+import PyQt6
 
 feat_dict = {"Phoenix": "Phoenix Shift", 
              "Garuda": "Deadly Embrace",
@@ -38,7 +39,9 @@ def randomizer(feats, abilities):
 
 def random_ability_remove(abilities):
     # choose a random eikon
-    ability_set = choice(list(abilities.items()))
+    ability_set = ("", None)
+    while ability_set[1] is None:
+        ability_set = choice(list(abilities.items()))
 
     # choose a random ability from that eikon
     ability = choice(ability_set[1])
