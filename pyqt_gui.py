@@ -23,34 +23,13 @@ class Window(QWidget):
     
     def generate_loadout(self):
         # temp testing
-        print(self.randomizer.randomize(replacement=False, exclude_ability=False, exclude_feat=False, exclude_dlc=False, pairing=False, pair_abilities=True))
+        print(self.randomizer.randomize(replacement=True, pairing=True, pair_abilities=True))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    feat_dict = {}
-    ability_dict = {}
-    eikons = ["Ifrit", "Phoenix", "Garuda", "Ramuh", "Titan", "Bahamut", "Shiva", "Odin", "Leviathan", "Ultima"]
-
-    count = 1
-    with open("feats_and_abilities.txt", "r") as f:
-        lines = f.readlines()
-        for eikon in eikons:
-            if eikon == "Ifrit":
-                ability_dict[eikons[0]] = lines[0].strip("\n").split(",")
-            else:
-                feat_dict[eikon] = lines[count].strip("\n")
-                ability_dict[eikon] = lines[count+1].strip("\n").split(",")
-                count += 2
-    f.close()
-
-    # add empty keys:value pairs for "No Ability" and "No Feat" settings
-    feat_dict[""] = ""
-    ability_dict[""] = [""]
-
-    randomizer = LoadoutRandomizer(feat_dict, ability_dict)
-
-    window = Window(randomizer)
+    # exclusion parameters included for testing
+    window = Window(LoadoutRandomizer(exclude_ability=False, exclude_feat=False, exclude_dlc=False))
     window.setWindowTitle("Final Fantasy XVI - Loadout Randomizer")
     window.setGeometry(100, 100, 700, 300)
     window.show()
