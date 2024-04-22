@@ -2,7 +2,8 @@ import copy
 from random import *
 
 class LoadoutRandomizer():
-    def __init__(self, exclude_ability, exclude_feat, exclude_dlc):
+    def __init__(self, eikons, exclude_ability, exclude_feat, exclude_dlc):
+        self.eikons = eikons
         self.feat_dict = {}
         self.ability_dict = {}
         self.fetch_eikon_details()
@@ -13,18 +14,20 @@ class LoadoutRandomizer():
         self.temp_ability_dict = copy.deepcopy(self.ability_dict)
     
     def fetch_eikon_details(self):
-        eikons = ["Ifrit", "Phoenix", "Garuda", "Ramuh", "Titan", "Bahamut", "Shiva", "Odin", "Leviathan", "Ultima"]
 
         count = 1
         with open("feats_and_abilities.txt", "r") as f:
             lines = f.readlines()
-            for eikon in eikons:
+            for eikon in self.eikons:
                 if eikon == "Ifrit":
-                    self.ability_dict[eikons[0]] = lines[0].strip("\n").split(",")
+                    self.ability_dict[self.eikons[0]] = lines[0].strip("\n").split(",")
                 else:
-                    self.feat_dict[eikon] = lines[count].strip("\n")
-                    self.ability_dict[eikon] = lines[count+1].strip("\n").split(",")
-                    count += 2
+                    if eikon != self.eikons[0]:
+                        if eikon != "":
+                            self.feat_dict[eikon] = lines[count].strip("\n")
+                            self.ability_dict[eikon] = lines[count+1].strip("\n").split(",")
+                        count += 2
+                    print(count)
         f.close()
 
         # add empty keys:value pairs for "No Ability" and "No Feat" settings
@@ -36,10 +39,12 @@ class LoadoutRandomizer():
         # don't allow no feat
         # don't allow no ability
         if exclude_dlc is True:
-            self.feat_dict.pop("Leviathan")
-            self.feat_dict.pop("Ultima")
-            self.ability_dict.pop("Leviathan")
-            self.ability_dict.pop("Ultima")
+            if "Leviathan" in self.eikons:
+                self.feat_dict.pop("Leviathan")
+                self.ability_dict.pop("Leviathan")
+            if "Ultima" in self.eikons:
+                self.feat_dict.pop("Ultima")
+                self.ability_dict.pop("Ultima")
         if exclude_feat is False:
             self.feat_dict.pop("")
         if exclude_ability is False:

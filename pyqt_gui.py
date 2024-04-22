@@ -23,13 +23,13 @@ class Window(QWidget):
     
     def generate_loadout(self):
         # temp testing
-        print(self.randomizer.randomize(replacement=True, pairing=True, pair_abilities=True))
+        print(self.randomizer.randomize(replacement=False, pairing=False, pair_abilities=True))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # exclusion parameters included for testing
-    window = Window(LoadoutRandomizer(exclude_ability=False, exclude_feat=False, exclude_dlc=False))
+    window = Window(LoadoutRandomizer(eikons=["", "Phoenix", "Garuda", "Ramuh", "Titan", "Bahamut", "Shiva", "Odin", "Leviathan", "Ultima"], exclude_ability=False, exclude_feat=False, exclude_dlc=False))
     window.setWindowTitle("Final Fantasy XVI - Loadout Randomizer")
     window.setGeometry(100, 100, 700, 300)
     window.show()
