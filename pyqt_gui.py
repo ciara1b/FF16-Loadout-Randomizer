@@ -40,14 +40,28 @@ class MainWindow(QMainWindow):
                     "Check this if you want it to be possible for any given feat to be empty.",
                     "Eikons only available through DLC will not be considered."]
 
-        for i in range(0, 6):
-            checkbox = self.create_checkbox()
-            if i == 5:
-                checkbox.setCheckState(Qt.CheckState.Checked)
-            checkbox.setText(labels[i])
-            checkbox.setToolTip(tooltips[i])
-            layout.addWidget(checkbox)
+        # create checkboxes
+        self.checkbox_replace = self.create_checkbox()
+        self.checkbox_pairing = self.create_checkbox()
+        self.checkbox_pair_abty = self.create_checkbox()
+        self.checkbox_excl_abty = self.create_checkbox()
+        self.checkbox_excl_feat = self.create_checkbox()
+        self.checkbox_excl_dlc = self.create_checkbox()
+        
+        self.set_checkbox(self.checkbox_replace, labels, tooltips, 0)
+        self.set_checkbox(self.checkbox_pairing, labels, tooltips, 1)
+        self.set_checkbox(self.checkbox_pair_abty, labels, tooltips, 2)
+        self.set_checkbox(self.checkbox_excl_abty, labels, tooltips, 3)
+        self.set_checkbox(self.checkbox_excl_feat, labels, tooltips, 4)
+        self.set_checkbox(self.checkbox_excl_dlc, labels, tooltips, 5)
 
+        # add widgets
+        layout.addWidget(self.checkbox_replace)
+        layout.addWidget(self.checkbox_pairing)
+        layout.addWidget(self.checkbox_pair_abty)
+        layout.addWidget(self.checkbox_excl_abty)
+        layout.addWidget(self.checkbox_excl_feat)
+        layout.addWidget(self.checkbox_excl_dlc)
         layout.addWidget(button)
 
         layout.addStretch(1)
@@ -57,12 +71,23 @@ class MainWindow(QMainWindow):
     def create_checkbox(self):
         widget = QCheckBox()
         widget.setCheckState(Qt.CheckState.Unchecked)
-        widget.stateChanged.connect(self.show_state)
+        widget.stateChanged.connect(self.set_state)
         return widget
     
-    def show_state(self, s):
-        print(s == Qt.CheckState.Unchecked.value)
-        print(s)
+    def set_checkbox(self, checkbox, labels, tooltips, i):
+        if i == 5:
+            checkbox.setCheckState(Qt.CheckState.Checked)
+        checkbox.setText(labels[i])
+        checkbox.setAccessibleName(labels[i])
+        checkbox.setToolTip(tooltips[i])
+    
+    def set_state(self, s):
+        self.replacement = (True if self.checkbox_replace.isChecked() else False)
+        self.pairing = (True if self.checkbox_pairing.isChecked() else False)
+        self.pair_abilities = (True if self.checkbox_pair_abty.isChecked() else False)
+        self.exclude_ability = (True if self.checkbox_excl_abty.isChecked() else False)
+        self.exclude_feat = (True if self.checkbox_excl_feat.isChecked() else False)
+        self.exclude_dlc = (True if self.checkbox_excl_dlc.isChecked() else False)
     
     def generate_loadout(self):
         print(self.randomizer.randomize(self.replacement, self.pairing, self.pair_abilities))
