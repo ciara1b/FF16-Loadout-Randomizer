@@ -22,7 +22,8 @@ class Window(QWidget):
         self.setLayout(layout)
     
     def generate_loadout(self):
-        print(self.randomizer.randomize())
+        # temp testing
+        print(self.randomizer.randomize(replacement=False, exclude_ability=True, exclude_feat=True, exclude_dlc=False, pairing=True))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -42,6 +43,10 @@ if __name__ == "__main__":
                 ability_dict[eikon] = lines[count+1].strip("\n").split(",")
                 count += 2
     f.close()
+
+    # add empty keys:value pairs for "No Ability" and "No Feat" settings
+    feat_dict[""] = ""
+    ability_dict[""] = [""]
 
     randomizer = LoadoutRandomizer(feat_dict, ability_dict)
 
