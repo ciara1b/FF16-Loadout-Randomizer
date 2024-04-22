@@ -34,7 +34,7 @@ class LoadoutRandomizer():
 
         # add empty keys:value pairs for "No Ability" and "No Feat" settings
         self.feat_dict[""] = ""
-        self.ability_dict[""] = [""]
+        self.ability_dict[""] = ["", "", "", "", "", ""]
 
     def exclusion_criteria(self, exclude_ability, exclude_feat, exclude_dlc):
         # exlcude DLC eikons
