@@ -2,10 +2,13 @@ import copy
 from random import *
 
 class LoadoutRandomizer():
-    def __init__(self, eikons, exclude_ability, exclude_feat, exclude_dlc):
-        self.eikons = eikons
+
+    def __init__(self):
         self.feat_dict = {}
         self.ability_dict = {}
+
+    def set_parameters(self, eikons, exclude_ability, exclude_feat, exclude_dlc):
+        self.eikons = eikons
         self.fetch_eikon_details()
 
         self.exclusion_criteria(exclude_ability, exclude_feat, exclude_dlc)
@@ -27,7 +30,6 @@ class LoadoutRandomizer():
                             self.feat_dict[eikon] = lines[count].strip("\n")
                             self.ability_dict[eikon] = lines[count+1].strip("\n").split(",")
                         count += 2
-                    print(count)
         f.close()
 
         # add empty keys:value pairs for "No Ability" and "No Feat" settings
