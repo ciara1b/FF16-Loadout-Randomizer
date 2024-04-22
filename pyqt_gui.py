@@ -23,7 +23,7 @@ class Window(QWidget):
     
     def generate_loadout(self):
         # temp testing
-        print(self.randomizer.randomize(replacement=False, exclude_ability=True, exclude_feat=True, exclude_dlc=False, pairing=True))
+        print(self.randomizer.randomize(replacement=False, exclude_ability=False, exclude_feat=False, exclude_dlc=False, pairing=False, pair_abilities=True))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
