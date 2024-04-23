@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 
 from loadout_randomizer import *
+from clickable_image import *
 
 class MainWindow(QMainWindow):
     def __init__(self, randomizer, parent=None):
@@ -15,7 +16,7 @@ class MainWindow(QMainWindow):
         self.chosen_eikons = ["Ifrit", "Phoenix", "Garuda", "Ramuh", "Titan", "Bahamut", "Shiva", "Odin", "Leviathan", "Ultima"]
 
         self.widget = QWidget()
-        self.layout = QVBoxLayout()
+        self.layout = QGridLayout()
         self.layout_setup()
 
     def layout_setup(self):
@@ -27,6 +28,7 @@ class MainWindow(QMainWindow):
         button.setFixedSize(100, 30)
         button.clicked.connect(self.finalize_parameters)
 
+        # labels and tooltips for checkboxes
         labels = ["Repeat Abilities", "Match Feats & Abilities", "Pair Abilities", "Allow No Ability", "Allow No Feat", "Exclude DLC Eikons"]
         tooltips = ["Every ability can appear more than once. If you're unlucky, this could result in every ability being the same.",
                     "Example: if one of your feats was Bahamut, it will only choose between Bahamut's abilities to be paired with \nthat feat. If the feat is empty, this will give you two completely random abilites instead.",
@@ -37,31 +39,42 @@ class MainWindow(QMainWindow):
 
         # create checkboxes
         for i in range(0, 6):
-            checkbox = self.create_checkbox()
+            checkbox = self.create_checkbox(labels[i], tooltips[i], list(self.exclusion_criteria)[i])
             if i == 5:
                 checkbox.setCheckState(Qt.CheckState.Checked)
-            checkbox.setText(labels[i])
-            checkbox.setToolTip(tooltips[i])
-            self.layout.addWidget(checkbox)
+            else:
+                checkbox.setCheckState(Qt.CheckState.Unchecked)
+            self.layout.addWidget(checkbox, i, 0)
 
-        self.layout.addWidget(button)
+        # create images
+        count = 1
+        for i in range(0, len(self.chosen_eikons)):
+            eikon_icon = PicButton("./Assets/Eikon Icons/" + self.chosen_eikons[i] + "_icon.png")
+            if i <= 3:
+                self.layout.addWidget(eikon_icon, 0, count)
+                count += 1
+            else:
+                count = 3
+                self.layout.addWidget(eikon_icon, 1, i-count)
+        
+        self.layout.addWidget(button, 6, 0)
 
-        self.layout.addStretch(1)
         self.widget.setLayout(self.layout)
         self.setCentralWidget(self.widget)
 
-    def create_checkbox(self):
+    def create_checkbox(self, text, tooltip, name):
         widget = QCheckBox()
-        widget.setCheckState(Qt.CheckState.Unchecked)
         widget.stateChanged.connect(self.set_state)
+        widget.setText(text)
+        widget.setToolTip(tooltip)
+        widget.setAccessibleName(name)
         return widget
     
-    def set_state(self, s):
+    def set_state(self):
         i = 0
         checkboxes = (self.layout.itemAt(i) for i in range(self.layout.count()))
         for item in checkboxes:
-            current_key = list(self.exclusion_criteria)[i]
-            self.exclusion_criteria[current_key] = (True if item.widget().isChecked() else False)
+            self.exclusion_criteria[item.widget().accessibleName()] = (True if item.widget().isChecked() else False)
             i += 1
             if i >= 6:
                 break
