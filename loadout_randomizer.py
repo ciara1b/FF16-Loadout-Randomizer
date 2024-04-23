@@ -4,14 +4,19 @@ from random import *
 class LoadoutRandomizer():
 
     def __init__(self):
+        # add empty keys:value pairs for "No Ability" and "No Feat" settings
         self.feat_dict = {}
         self.ability_dict = {}
 
     def set_parameters(self, eikons, exclude_ability, exclude_feat, exclude_dlc):
-        self.eikons = eikons
-        self.fetch_eikon_details()
+        # reset dictionaries with empty keys:value pairs for "No Ability" and "No Feat" settings
+        self.feat_dict = {"": ""}
+        self.ability_dict = {"": ["", "", "", "", "", ""]}
 
-        self.exclusion_criteria(exclude_ability, exclude_feat, exclude_dlc)
+        self.eikons = self.exclusion_criteria(exclude_ability, exclude_feat, exclude_dlc, eikons)
+        print(eikons)
+        print(self.eikons)
+        self.fetch_eikon_details()
 
         self.temp_feat_dict = copy.deepcopy(self.feat_dict)
         self.temp_ability_dict = copy.deepcopy(self.ability_dict)
@@ -25,38 +30,38 @@ class LoadoutRandomizer():
                 if eikon == "Ifrit":
                     self.ability_dict[self.eikons[0]] = lines[0].strip("\n").split(",")
                 else:
-                    if eikon != self.eikons[0]:
-                        if eikon != "":
-                            self.feat_dict[eikon] = lines[count].strip("\n")
-                            self.ability_dict[eikon] = lines[count+1].strip("\n").split(",")
-                        count += 2
+                    if eikon != "":
+                        self.feat_dict[eikon] = lines[count].strip("\n")
+                        self.ability_dict[eikon] = lines[count+1].strip("\n").split(",")
+                    count += 2
+
         f.close()
 
-        # add empty keys:value pairs for "No Ability" and "No Feat" settings
-        self.feat_dict[""] = ""
-        self.ability_dict[""] = ["", "", "", "", "", ""]
-
-    def exclusion_criteria(self, exclude_ability, exclude_feat, exclude_dlc):
+    def exclusion_criteria(self, exclude_ability, exclude_feat, exclude_dlc, eikons):
         # exlcude DLC eikons
         # don't allow no feat
         # don't allow no ability
+
         if exclude_dlc is True:
-            if "Leviathan" in self.eikons:
-                self.feat_dict.pop("Leviathan")
-                self.ability_dict.pop("Leviathan")
-            if "Ultima" in self.eikons:
-                self.feat_dict.pop("Ultima")
-                self.ability_dict.pop("Ultima")
+            if "Leviathan" in eikons:
+                eikons.remove("Leviathan")
+            if "Ultima" in eikons:
+                eikons.remove("Ultima")
+            while len(eikons) > 8:
+                eikons.pop(-1)
         if exclude_feat is False:
             self.feat_dict.pop("")
         if exclude_ability is False:
             self.ability_dict.pop("")
+        return eikons
 
     def randomize(self, replacement, pairing, pair_abilities):
         loadout = {}
 
         # choose feats
         feat_set = self.random_feat()
+        while len(feat_set) < 3:
+            feat_set.append("")
 
         # "apply" abilities to every feat
         for feat in feat_set:
@@ -80,7 +85,10 @@ class LoadoutRandomizer():
         return loadout
     
     def find_eikon_from_feat(self, feat):
-        return list(self.temp_feat_dict.keys())[list(self.temp_feat_dict.values()).index(feat)]
+        if feat != "":
+            return list(self.temp_feat_dict.keys())[list(self.temp_feat_dict.values()).index(feat)]
+        else:
+            return ""
     
     def reset_dictionaries(self):
         self.temp_ability_dict = copy.deepcopy(self.ability_dict)
@@ -89,7 +97,7 @@ class LoadoutRandomizer():
 
     def random_feat(self):
         # choose 3 random feats
-        return sample(list(self.temp_feat_dict.values()), 3)
+        return sample(list(self.temp_feat_dict.values()), (3 if len(self.temp_feat_dict) >= 3 else len(self.temp_feat_dict)))
 
     def random_ability(self, replacement, pair_eikon=None, pair=None):
         # choose a random eikon
