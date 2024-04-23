@@ -102,12 +102,10 @@ class MainWindow(QMainWindow):
         eikon_icons = [self.layout.itemAt(i).widget() for i in range(6, 6 + len(self.chosen_eikons))]
         for icon in eikon_icons:
             if eikon in icon.get_image():
-                if "transparent" in icon.get_image():
-                    icon.set_image(icon.get_image().split("_transparent.png")[0] + ".png")
+                if icon.get_selected() is False:
                     self.chosen_eikons[eikon_icons.index(icon)] = eikon
                     selected = True
                 else:
-                    icon.set_image(icon.get_image().split(".png")[0] + "_transparent.png")
                     self.chosen_eikons[self.chosen_eikons.index(eikon)] = ""
                     selected = False
                 icon.set_pixmap(selected)
