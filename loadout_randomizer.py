@@ -15,6 +15,7 @@ class LoadoutRandomizer():
 
         self.eikons = self.exclusion_criteria(exclude_ability, exclude_feat, exclude_dlc, eikons)
         self.fetch_eikon_details()
+        print(self.feat_dict)
 
         self.temp_feat_dict = copy.deepcopy(self.feat_dict)
         self.temp_ability_dict = copy.deepcopy(self.ability_dict)
@@ -24,14 +25,16 @@ class LoadoutRandomizer():
         count = 1
         with open("feats_and_abilities.txt", "r") as f:
             lines = f.readlines()
-            for eikon in self.eikons:
+            for i, eikon in enumerate(self.eikons):
                 if eikon == "Ifrit":
                     self.ability_dict[self.eikons[0]] = lines[0].strip("\n").split(",")
                 else:
-                    if eikon != "":
-                        self.feat_dict[eikon] = lines[count].strip("\n")
-                        self.ability_dict[eikon] = lines[count+1].strip("\n").split(",")
-                    count += 2
+                    if i != 0:
+                        print("here")
+                        if eikon != "":
+                            self.feat_dict[eikon] = lines[count].strip("\n")
+                            self.ability_dict[eikon] = lines[count+1].strip("\n").split(",")
+                        count += 2
 
         f.close()
 
@@ -75,7 +78,10 @@ class LoadoutRandomizer():
             else:
                 ability_one = self.random_ability(replacement, pair_eikon=eikon)
                 ability_two = self.random_ability(replacement, pair_eikon=eikon)
-                loadout[feat] = [ability_one, ability_two]
+                if feat == "" and feat in list(loadout.keys()):
+                    loadout[" "] = [ability_one, ability_two]
+                else:
+                    loadout[feat] = [ability_one, ability_two]
         
         # reset dictionaries for possible re-randomize
         self.reset_dictionaries()

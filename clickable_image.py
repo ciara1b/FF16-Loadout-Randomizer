@@ -15,8 +15,12 @@ class PicButton(QAbstractButton):
     def set_image(self, image):
         self.image = image
 
-    def set_pixmap(self):
-        self.pixmap = QPixmap(self.image)
+    def set_pixmap(self, selected):
+        if selected is False:
+            self.pixmap.load(self.image)
+        else:
+            self.pixmap.load(self.image)
+        self.update()
 
     def paintEvent(self, event):
         painter = QPainter(self)

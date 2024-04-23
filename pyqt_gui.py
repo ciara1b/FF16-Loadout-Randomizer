@@ -13,12 +13,17 @@ class MainWindow(QMainWindow):
         self.exclusion_criteria = {"replacement": False, "pairing": False, "pair_abilities": False, "exclude_ability": False,
                                    "exclude_feat": False, "exclude_dlc": True}
         self.chosen_eikons = []
+        self.temp_eikons = ["Leviathan", "Utima"]
         self.init_eikons()
 
         self.randomizer = randomizer
 
         self.widget = QWidget()
         self.layout = QGridLayout()
+        for i in range(21):
+            r = (6 % (i + 1)) // 6
+            self.layout.setColumnStretch(i % 6, 1)
+            self.layout.setRowStretch(r, 1)
         self.layout_setup()
 
     def init_eikons(self):
@@ -63,6 +68,12 @@ class MainWindow(QMainWindow):
                 self.layout.addWidget(eikon_icon, 1, i-count)
             eikon_icon.clicked.connect(partial(self.set_image, self.chosen_eikons[i]))
     
+        titles = QLabel(text="Feats\t\tAbilities")
+        self.layout.addWidget(titles, 2, 1)
+        for i in range (3):
+            current_set = QLabel(text="")
+            self.layout.addWidget(current_set, i+3, 1)
+
         self.layout.addWidget(button, 6, 0)
 
         self.widget.setLayout(self.layout)
@@ -94,17 +105,41 @@ class MainWindow(QMainWindow):
                 if "transparent" in icon.get_image():
                     icon.set_image(icon.get_image().split("_transparent.png")[0] + ".png")
                     self.chosen_eikons[eikon_icons.index(icon)] = eikon
+                    selected = True
                 else:
                     icon.set_image(icon.get_image().split(".png")[0] + "_transparent.png")
                     self.chosen_eikons[self.chosen_eikons.index(eikon)] = ""
-                icon.set_pixmap()
-                print(self.chosen_eikons)
+                    selected = False
+                icon.set_pixmap(selected)
                 break
         self.temp_eikons = copy.deepcopy(self.chosen_eikons[8:10])
     
     def generate_loadout(self):
-        print(self.randomizer.randomize(self.exclusion_criteria.get("replacement"), self.exclusion_criteria.get("pairing"),
-                                        self.exclusion_criteria.get("pair_abilities")))
+        results = self.randomizer.randomize(self.exclusion_criteria.get("replacement"), self.exclusion_criteria.get("pairing"),
+                                        self.exclusion_criteria.get("pair_abilities"))
+        keys = list(results.keys())
+        values = list(results.values())
+
+        i = 0
+        sets_labels = [self.layout.itemAt(i).widget() for i in range(17, 20)]
+        for set_label in sets_labels:
+            if keys[i] == "" or keys[i] == " ":
+                key_text = "EMPTY: \t\t"
+            else:
+                key_text = keys[i] + ": \t"
+
+            if values[i][0] == (""):
+                value_one_text = "EMPTY"
+            else:
+                value_one_text = values[i][0]
+            if values[i][1] == (""):
+                value_two_text = "EMPTY"
+            else:
+                value_two_text = values[i][1]
+
+            set_label.setText(key_text + value_one_text + ", " + value_two_text)
+            i += 1
+
         self.init_eikons()
     
     def finalize_parameters(self):
