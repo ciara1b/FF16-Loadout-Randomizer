@@ -14,8 +14,6 @@ class LoadoutRandomizer():
         self.ability_dict = {"": ["", "", "", "", "", ""]}
 
         self.eikons = self.exclusion_criteria(exclude_ability, exclude_feat, exclude_dlc, eikons)
-        print(eikons)
-        print(self.eikons)
         self.fetch_eikon_details()
 
         self.temp_feat_dict = copy.deepcopy(self.feat_dict)

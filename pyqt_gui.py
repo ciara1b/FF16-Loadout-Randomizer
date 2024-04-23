@@ -101,7 +101,6 @@ class MainWindow(QMainWindow):
                 print(self.chosen_eikons)
                 break
         self.temp_eikons = copy.deepcopy(self.chosen_eikons[8:10])
-        print(self.temp_eikons)
     
     def generate_loadout(self):
         print(self.randomizer.randomize(self.exclusion_criteria.get("replacement"), self.exclusion_criteria.get("pairing"),
