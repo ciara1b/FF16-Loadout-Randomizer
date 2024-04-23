@@ -15,7 +15,6 @@ class LoadoutRandomizer():
 
         self.eikons = self.exclusion_criteria(exclude_ability, exclude_feat, exclude_dlc, eikons)
         self.fetch_eikon_details()
-        print(self.feat_dict)
 
         self.temp_feat_dict = copy.deepcopy(self.feat_dict)
         self.temp_ability_dict = copy.deepcopy(self.ability_dict)
@@ -30,7 +29,6 @@ class LoadoutRandomizer():
                     self.ability_dict[self.eikons[0]] = lines[0].strip("\n").split(",")
                 else:
                     if i != 0:
-                        print("here")
                         if eikon != "":
                             self.feat_dict[eikon] = lines[count].strip("\n")
                             self.ability_dict[eikon] = lines[count+1].strip("\n").split(",")

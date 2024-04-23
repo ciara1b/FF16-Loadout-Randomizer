@@ -9,6 +9,7 @@ class PicButton(QAbstractButton):
         
         self.image = image
         self.pixmap = QPixmap(self.image)
+        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
     def get_image(self):
         return self.image
