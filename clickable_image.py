@@ -7,12 +7,16 @@ class PicButton(QAbstractButton):
     def __init__(self, image, parent=None):
         super(PicButton, self).__init__(parent)
         
-        self.pixmap = QPixmap(image)
-        self.clicked.connect(self.test)
+        self.image = image
+        self.pixmap = QPixmap(self.image)
 
-    def test(self):
-        if self.underMouse():
-            print("test")
+    def get_image(self):
+        return self.image
+    def set_image(self, image):
+        self.image = image
+
+    def set_pixmap(self):
+        self.pixmap = QPixmap(self.image)
 
     def paintEvent(self, event):
         painter = QPainter(self)

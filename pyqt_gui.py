@@ -1,6 +1,7 @@
 import sys
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
+from functools import partial
 
 from loadout_randomizer import *
 from clickable_image import *
@@ -21,10 +22,7 @@ class MainWindow(QMainWindow):
 
     def layout_setup(self):
         # Button with text, and a parent widget
-        button = QPushButton(
-            text="Randomize",
-            parent=self
-        )
+        button = QPushButton(text="Randomize", parent=self)
         button.setFixedSize(100, 30)
         button.clicked.connect(self.finalize_parameters)
 
@@ -56,7 +54,8 @@ class MainWindow(QMainWindow):
             else:
                 count = 3
                 self.layout.addWidget(eikon_icon, 1, i-count)
-        
+            eikon_icon.clicked.connect(partial(self.set_image, self.chosen_eikons[i]))
+    
         self.layout.addWidget(button, 6, 0)
 
         self.widget.setLayout(self.layout)
@@ -64,19 +63,30 @@ class MainWindow(QMainWindow):
 
     def create_checkbox(self, text, tooltip, name):
         widget = QCheckBox()
-        widget.stateChanged.connect(self.set_state)
+        widget.stateChanged.connect(partial(self.set_state, name))
         widget.setText(text)
         widget.setToolTip(tooltip)
         widget.setAccessibleName(name)
         return widget
     
-    def set_state(self):
-        i = 0
-        checkboxes = (self.layout.itemAt(i) for i in range(self.layout.count()))
+    def set_state(self, name):
+        checkboxes = (self.layout.itemAt(i).widget() for i in range(self.layout.count()))
         for item in checkboxes:
-            self.exclusion_criteria[item.widget().accessibleName()] = (True if item.widget().isChecked() else False)
-            i += 1
-            if i >= 6:
+            if name == item.accessibleName():
+                self.exclusion_criteria[item.accessibleName()] = (True if item.isChecked() else False)
+                break
+    
+    def set_image(self, eikon):
+        eikon_icons = [self.layout.itemAt(i).widget() for i in range(6, 6 + len(self.chosen_eikons))]
+        for icon in eikon_icons:
+            if eikon in icon.get_image():
+                if "transparent" in icon.get_image():
+                    icon.set_image(icon.get_image().split("_transparent.png")[0] + ".png")
+                    self.chosen_eikons[eikon_icons.index(icon)-6] = eikon
+                else:
+                    icon.set_image(icon.get_image().split(".png")[0] + "_transparent.png")
+                    self.chosen_eikons[self.chosen_eikons.index(eikon)] = ""
+                icon.set_pixmap()
                 break
     
     def generate_loadout(self):
