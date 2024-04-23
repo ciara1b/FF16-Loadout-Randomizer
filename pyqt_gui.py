@@ -8,16 +8,14 @@ class MainWindow(QMainWindow):
     def __init__(self, randomizer, parent=None):
         super().__init__()
 
-        self.replacement = False
-        self.pairing = False
-        self.pair_abilities = False
-        self.exclude_ability = False
-        self.exclude_feat = False
-        self.exclude_dlc = True
+        self.exclusion_criteria = {"replacement": False, "pairing": False, "pair_abilities": False, "exclude_ability": False,
+                                   "exclude_feat": False, "exclude_dlc": True}
 
         self.randomizer = randomizer
         self.chosen_eikons = ["Ifrit", "Phoenix", "Garuda", "Ramuh", "Titan", "Bahamut", "Shiva", "Odin", "Leviathan", "Ultima"]
 
+        self.widget = QWidget()
+        self.layout = QVBoxLayout()
         self.layout_setup()
 
     def layout_setup(self):
@@ -29,9 +27,6 @@ class MainWindow(QMainWindow):
         button.setFixedSize(100, 30)
         button.clicked.connect(self.finalize_parameters)
 
-        widget = QWidget()
-        layout = QVBoxLayout()
-
         labels = ["Repeat Abilities", "Match Feats & Abilities", "Pair Abilities", "Allow No Ability", "Allow No Feat", "Exclude DLC Eikons"]
         tooltips = ["Every ability can appear more than once. If you're unlucky, this could result in every ability being the same.",
                     "Example: if one of your feats was Bahamut, it will only choose between Bahamut's abilities to be paired with \nthat feat. If the feat is empty, this will give you two completely random abilites instead.",
@@ -41,32 +36,19 @@ class MainWindow(QMainWindow):
                     "Eikons only available through DLC will not be considered."]
 
         # create checkboxes
-        self.checkbox_replace = self.create_checkbox()
-        self.checkbox_pairing = self.create_checkbox()
-        self.checkbox_pair_abty = self.create_checkbox()
-        self.checkbox_excl_abty = self.create_checkbox()
-        self.checkbox_excl_feat = self.create_checkbox()
-        self.checkbox_excl_dlc = self.create_checkbox()
-        
-        self.set_checkbox(self.checkbox_replace, labels, tooltips, 0)
-        self.set_checkbox(self.checkbox_pairing, labels, tooltips, 1)
-        self.set_checkbox(self.checkbox_pair_abty, labels, tooltips, 2)
-        self.set_checkbox(self.checkbox_excl_abty, labels, tooltips, 3)
-        self.set_checkbox(self.checkbox_excl_feat, labels, tooltips, 4)
-        self.set_checkbox(self.checkbox_excl_dlc, labels, tooltips, 5)
+        for i in range(0, 6):
+            checkbox = self.create_checkbox()
+            if i == 5:
+                checkbox.setCheckState(Qt.CheckState.Checked)
+            checkbox.setText(labels[i])
+            checkbox.setToolTip(tooltips[i])
+            self.layout.addWidget(checkbox)
 
-        # add widgets
-        layout.addWidget(self.checkbox_replace)
-        layout.addWidget(self.checkbox_pairing)
-        layout.addWidget(self.checkbox_pair_abty)
-        layout.addWidget(self.checkbox_excl_abty)
-        layout.addWidget(self.checkbox_excl_feat)
-        layout.addWidget(self.checkbox_excl_dlc)
-        layout.addWidget(button)
+        self.layout.addWidget(button)
 
-        layout.addStretch(1)
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
+        self.layout.addStretch(1)
+        self.widget.setLayout(self.layout)
+        self.setCentralWidget(self.widget)
 
     def create_checkbox(self):
         widget = QCheckBox()
@@ -74,26 +56,23 @@ class MainWindow(QMainWindow):
         widget.stateChanged.connect(self.set_state)
         return widget
     
-    def set_checkbox(self, checkbox, labels, tooltips, i):
-        if i == 5:
-            checkbox.setCheckState(Qt.CheckState.Checked)
-        checkbox.setText(labels[i])
-        checkbox.setAccessibleName(labels[i])
-        checkbox.setToolTip(tooltips[i])
-    
     def set_state(self, s):
-        self.replacement = (True if self.checkbox_replace.isChecked() else False)
-        self.pairing = (True if self.checkbox_pairing.isChecked() else False)
-        self.pair_abilities = (True if self.checkbox_pair_abty.isChecked() else False)
-        self.exclude_ability = (True if self.checkbox_excl_abty.isChecked() else False)
-        self.exclude_feat = (True if self.checkbox_excl_feat.isChecked() else False)
-        self.exclude_dlc = (True if self.checkbox_excl_dlc.isChecked() else False)
+        i = 0
+        checkboxes = (self.layout.itemAt(i) for i in range(self.layout.count()))
+        for item in checkboxes:
+            current_key = list(self.exclusion_criteria)[i]
+            self.exclusion_criteria[current_key] = (True if item.widget().isChecked() else False)
+            i += 1
+            if i >= 6:
+                break
     
     def generate_loadout(self):
-        print(self.randomizer.randomize(self.replacement, self.pairing, self.pair_abilities))
+        print(self.randomizer.randomize(self.exclusion_criteria.get("replacement"), self.exclusion_criteria.get("pairing"),
+                                        self.exclusion_criteria.get("pair_abilities")))
     
     def finalize_parameters(self):
-        self.randomizer.set_parameters(self.chosen_eikons, self.exclude_ability, self.exclude_feat, self.exclude_dlc)
+        self.randomizer.set_parameters(self.chosen_eikons, self.exclusion_criteria.get("exclude_ability"),
+                                       self.exclusion_criteria.get("exclude_feat"), self.exclusion_criteria.get("exclude_dlc"))
         self.generate_loadout()
 
 if __name__ == "__main__":
