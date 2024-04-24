@@ -18,12 +18,13 @@ class MainWindow(QMainWindow):
 
         self.randomizer = randomizer
 
+        # set up style
+        self.styleComboBox = QComboBox()
+        self.styleComboBox.addItems(QStyleFactory.keys())
+        self.changeStyle("Fusion")
+        
         self.widget = QWidget()
         self.layout = QGridLayout()
-        for i in range(21):
-            r = (6 % (i + 1)) // 6
-            self.layout.setColumnStretch(i % 6, 1)
-            self.layout.setRowStretch(r, 1)
         self.layout_setup()
 
     def init_eikons(self):
@@ -33,6 +34,13 @@ class MainWindow(QMainWindow):
         elif len(self.chosen_eikons) == 0:
             self.chosen_eikons = ["Ifrit", "Phoenix", "Garuda", "Ramuh", "Titan", "Bahamut", "Shiva", "Odin", "Leviathan", "Ultima"]
         return
+    
+    def changeStyle(self, styleName):
+        QApplication.setStyle(QStyleFactory.create(styleName))
+        self.changePalette()
+
+    def changePalette(self):
+        QApplication.setPalette(QApplication.style().standardPalette())
 
     def layout_setup(self):
         # Button with text, and a parent widget
@@ -41,7 +49,7 @@ class MainWindow(QMainWindow):
         button.clicked.connect(self.finalize_parameters)
 
         # labels and tooltips for checkboxes
-        labels = ["Repeat Abilities", "Match Feats & Abilities", "Pair Abilities", "Allow No Ability", "Allow No Feat", "Exclude DLC Eikons"]
+        labels = ["Repeat Abilities", "Must Match", "Pair Abilities", "Allow No Ability", "Allow No Feat", "Exclude DLC Eikons"]
         tooltips = ["Every ability can appear more than once. If you're unlucky, this could result in every ability being the same.",
                     "Example: if one of your feats was Bahamut, it will only choose between Bahamut's abilities to be paired with \nthat feat. If the feat is empty, this will give you two completely random abilites instead.",
                     "Regardless of the chosen feat, for each pair, selected abilities will always be from the same Eikon. This \noption will never give you an empty ability regardless of if 'Allow No Ability' is selected. \nWARNING: this option does nothing if 'Match Feats & Abilities' is also selected.",
@@ -54,27 +62,27 @@ class MainWindow(QMainWindow):
             checkbox = self.create_checkbox(labels[i], tooltips[i], list(self.exclusion_criteria)[i])
             if i == 5:
                 checkbox.setCheckState(Qt.CheckState.Checked)
-            self.layout.addWidget(checkbox, i, 0)
+            self.layout.addWidget(checkbox, i+2, 0, 1, 3, Qt.AlignmentFlag.AlignBottom)
 
         # create images
-        count = 1
+        count = 0
         for i in range(0, len(self.chosen_eikons)):
             eikon_icon = PicButton("./Assets/Eikon Icons/" + self.chosen_eikons[i] + "_icon.png")
             if i <= 4:
                 self.layout.addWidget(eikon_icon, 0, count)
                 count += 1
             else:
-                count = 4
                 self.layout.addWidget(eikon_icon, 1, i-count)
             eikon_icon.clicked.connect(partial(self.set_image, self.chosen_eikons[i]))
     
+        # create labels for results
         titles = QLabel(text="Feats\t\tAbilities")
-        self.layout.addWidget(titles, 2, 1)
+        self.layout.addWidget(titles, 2, 2, 1, 3, Qt.AlignmentFlag.AlignVCenter)
         for i in range (3):
             current_set = QLabel(text="")
-            self.layout.addWidget(current_set, i+3, 1)
+            self.layout.addWidget(current_set, i+3, 2, 1, 3, Qt.AlignmentFlag.AlignVCenter)
 
-        self.layout.addWidget(button, 6, 0)
+        self.layout.addWidget(button, 8, 0)
 
         self.widget.setLayout(self.layout)
         self.setCentralWidget(self.widget)
@@ -151,5 +159,6 @@ if __name__ == "__main__":
     randomizer = LoadoutRandomizer()
     window = MainWindow(randomizer)
     window.setWindowTitle("Final Fantasy XVI - Loadout Randomizer")
+    window.setFixedSize(677, 450)
     window.show()
     sys.exit(app.exec())

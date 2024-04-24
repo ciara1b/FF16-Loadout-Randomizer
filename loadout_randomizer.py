@@ -116,15 +116,17 @@ class LoadoutRandomizer():
         # else if no eikon provided, provided two abilities from same random eikon if requested
         elif pair is True:
             ability_set = choice(list(self.temp_ability_dict.items()))
-
+            
             # check for replacement and ability sets with less than two abilities left
             if (replacement is False) and (len(ability_set[1]) > 1):
                 paired_abilities = sample(list(ability_set[1]), 2)
                 ability_set[1].remove(paired_abilities[0])
                 ability_set[1].remove(paired_abilities[1])
                 self.temp_ability_dict[ability_set[0]] = ability_set[1]
-            else:
+            elif (replacement is True) and (len(ability_set[1] > 0)):
                 paired_abilities = choices(list(ability_set[1]), k=2)
+            elif (len(ability_set[1]) == 0):
+                paired_abilities = ["", ""]
 
             return paired_abilities
         # else parameters don't matter here, just pick an ability at random
