@@ -1,6 +1,7 @@
 import sys
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
+from PyQt6.QtGui import *
 from functools import partial
 
 from loadout_randomizer import *
@@ -49,7 +50,7 @@ class MainWindow(QMainWindow):
         button.clicked.connect(self.finalize_parameters)
 
         # labels and tooltips for checkboxes
-        labels = ["Repeat Abilities", "Match Feats && Abilities", "Pair Abilities", "Allow No Ability", "Allow No Feat", "Exclude DLC Eikons"]
+        labels = ["Repeat Abilities", "Match Feats && Abilities", "Pair Abilities", "Allow No Ability", "Allow No Feat", "Exclude DLC"]
         tooltips = ["Every ability can appear more than once. If you're unlucky, this could result in every ability being the same.",
                     "Example: if one of your feats was Bahamut, it will only choose between Bahamut's abilities to be paired with \nthat feat. If the feat is empty, this will give you two completely random abilites instead.",
                     "Regardless of the chosen feat, for each pair, selected abilities will always be from the same Eikon. This \noption will never give you an empty ability regardless of if 'Allow No Ability' is selected. \nWARNING: this option does nothing if 'Match Feats & Abilities' is also selected.",
@@ -64,7 +65,7 @@ class MainWindow(QMainWindow):
             checkbox = self.create_checkbox(labels[i], tooltips[i], list(self.exclusion_criteria)[i])
             if i == 5:
                 checkbox.setCheckState(Qt.CheckState.Checked)
-            vLayout.addWidget(checkbox, alignment=Qt.AlignmentFlag.AlignBottom)
+            vLayout.addWidget(checkbox, alignment=(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignLeft))
         checkboxesGroup.setLayout(vLayout)
         self.layout.addWidget(checkboxesGroup, 2, 0, 4, 2)
 
@@ -76,17 +77,27 @@ class MainWindow(QMainWindow):
                 self.layout.addWidget(eikon_icon, 0, count)
                 count += 1
             else:
+                if i > 7:
+                    eikon_icon.setVisible(False)
                 self.layout.addWidget(eikon_icon, 1, i-count)
             eikon_icon.clicked.connect(partial(self.set_image, self.chosen_eikons[i]))
+
+        # Button to show/unspoiler DLC Eikons
+        unspoiler_button = QPushButton(text="Show DLC Spoilers", parent=self)
+        unspoiler_button.setFixedSize(126, 30)
+        unspoiler_button.clicked.connect(self.show_dlc_eikons)
     
         # create labels for results
-        titles = QLabel(text="Feats\t\tAbilities")
-        self.layout.addWidget(titles, 2, 3, 1, 3, Qt.AlignmentFlag.AlignVCenter)
+        labelsGroup = QGroupBox("Feats && Abilities")
+        vLabelLayout = QVBoxLayout()
         for i in range (3):
             current_set = QLabel(text="")
-            self.layout.addWidget(current_set, i+3, 3, 1, 3, Qt.AlignmentFlag.AlignVCenter)
+            vLabelLayout.addWidget(current_set, alignment=Qt.AlignmentFlag.AlignVCenter)
+        labelsGroup.setLayout(vLabelLayout)
+        self.layout.addWidget(labelsGroup, 2, 2, 1, 3)
 
-        self.layout.addWidget(button, 8, 0)
+        self.layout.addWidget(button, 3, 2, 3, 3, alignment=(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter))
+        self.layout.addWidget(unspoiler_button, 6, 0, 1, 2, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.widget.setLayout(self.layout)
         self.setCentralWidget(self.widget)
@@ -124,34 +135,45 @@ class MainWindow(QMainWindow):
                 icon.set_pixmap(selected)
                 break
         self.temp_eikons = copy.deepcopy(self.chosen_eikons[8:10])
+
+    def show_dlc_eikons(self):
+
+        eikon_icons = [self.layout.itemAt(i).widget() for i in range(1, 1 + len(self.chosen_eikons))]
+        eikon_icons[8].setVisible(True)
+        eikon_icons[9].setVisible(True)
+
+        return
+
     
     def generate_loadout(self):
-        results = self.randomizer.randomize(self.exclusion_criteria.get("replacement"), self.exclusion_criteria.get("pairing"),
-                                        self.exclusion_criteria.get("pair_abilities"))
-        keys = list(results.keys())
-        values = list(results.values())
+        if (self.layout.count() > 0):
+            results = self.randomizer.randomize(self.exclusion_criteria.get("replacement"), self.exclusion_criteria.get("pairing"),
+                                            self.exclusion_criteria.get("pair_abilities"))
+            keys = list(results.keys())
+            values = list(results.values())
 
-        i = 0
-        sets_labels = [self.layout.itemAt(i).widget() for i in range(12, 15)]
-        for set_label in sets_labels:
-            if keys[i] == "" or keys[i] == " ":
-                key_text = "EMPTY: \t\t"
-            else:
-                key_text = keys[i] + ": \t"
+            i = 0
+            sets_labels = (self.layout.itemAt(11).widget().findChildren(QLabel))
+            for set_label in sets_labels:
+                if keys[i] == "" or keys[i] == " ":
+                    key_text = "EMPTY: \t\t"
+                else:
+                    key_text = keys[i] + ": \t"
 
-            if values[i][0] == (""):
-                value_one_text = "EMPTY"
-            else:
-                value_one_text = values[i][0]
-            if values[i][1] == (""):
-                value_two_text = "EMPTY"
-            else:
-                value_two_text = values[i][1]
+                if values[i][0] == (""):
+                    value_one_text = "EMPTY"
+                else:
+                    value_one_text = values[i][0]
+                if values[i][1] == (""):
+                    value_two_text = "EMPTY"
+                else:
+                    value_two_text = values[i][1]
 
-            set_label.setText(key_text + value_one_text + ", " + value_two_text)
-            i += 1
+                set_label.setText(key_text + value_one_text + ", " + value_two_text)
+                i += 1
 
-        self.init_eikons()
+            self.init_eikons()
+            return
     
     def finalize_parameters(self):
         self.randomizer.set_parameters(self.chosen_eikons, self.exclusion_criteria.get("exclude_ability"),
