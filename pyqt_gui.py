@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
         button.clicked.connect(self.finalize_parameters)
 
         # labels and tooltips for checkboxes
-        labels = ["Repeat Abilities", "Must Match", "Pair Abilities", "Allow No Ability", "Allow No Feat", "Exclude DLC Eikons"]
+        labels = ["Repeat Abilities", "Match Feats && Abilities", "Pair Abilities", "Allow No Ability", "Allow No Feat", "Exclude DLC Eikons"]
         tooltips = ["Every ability can appear more than once. If you're unlucky, this could result in every ability being the same.",
                     "Example: if one of your feats was Bahamut, it will only choose between Bahamut's abilities to be paired with \nthat feat. If the feat is empty, this will give you two completely random abilites instead.",
                     "Regardless of the chosen feat, for each pair, selected abilities will always be from the same Eikon. This \noption will never give you an empty ability regardless of if 'Allow No Ability' is selected. \nWARNING: this option does nothing if 'Match Feats & Abilities' is also selected.",
@@ -58,11 +58,15 @@ class MainWindow(QMainWindow):
                     "Eikons only available through DLC will not be considered."]
 
         # create checkboxes
+        checkboxesGroup = QGroupBox("Parameters")
+        vLayout = QVBoxLayout()
         for i in range(0, 6):
             checkbox = self.create_checkbox(labels[i], tooltips[i], list(self.exclusion_criteria)[i])
             if i == 5:
                 checkbox.setCheckState(Qt.CheckState.Checked)
-            self.layout.addWidget(checkbox, i+2, 0, 1, 3, Qt.AlignmentFlag.AlignBottom)
+            vLayout.addWidget(checkbox, alignment=Qt.AlignmentFlag.AlignBottom)
+        checkboxesGroup.setLayout(vLayout)
+        self.layout.addWidget(checkboxesGroup, 2, 0, 4, 2)
 
         # create images
         count = 0
@@ -77,10 +81,10 @@ class MainWindow(QMainWindow):
     
         # create labels for results
         titles = QLabel(text="Feats\t\tAbilities")
-        self.layout.addWidget(titles, 2, 2, 1, 3, Qt.AlignmentFlag.AlignVCenter)
+        self.layout.addWidget(titles, 2, 3, 1, 3, Qt.AlignmentFlag.AlignVCenter)
         for i in range (3):
             current_set = QLabel(text="")
-            self.layout.addWidget(current_set, i+3, 2, 1, 3, Qt.AlignmentFlag.AlignVCenter)
+            self.layout.addWidget(current_set, i+3, 3, 1, 3, Qt.AlignmentFlag.AlignVCenter)
 
         self.layout.addWidget(button, 8, 0)
 
@@ -98,16 +102,17 @@ class MainWindow(QMainWindow):
     
     def set_state(self, name):
         i = 0
-        checkboxes = (self.layout.itemAt(i) for i in range(self.layout.count()))
-        for item in checkboxes:
-            self.exclusion_criteria[item.widget().accessibleName()] = (True if item.widget().isChecked() else False)
-            i += 1
-            if i >= 6:
-                break
+        if (self.layout.count() > 0):
+            checkboxes = (self.layout.itemAt(0).widget().findChildren(QCheckBox))
+            for item in checkboxes:
+                self.exclusion_criteria[item.accessibleName()] = (True if item.isChecked() else False)
+                i += 1
+                if i >= 6:
+                    break
     
     def set_image(self, eikon):
 
-        eikon_icons = [self.layout.itemAt(i).widget() for i in range(6, 6 + len(self.chosen_eikons))]
+        eikon_icons = [self.layout.itemAt(i).widget() for i in range(1, 1 + len(self.chosen_eikons))]
         for icon in eikon_icons:
             if eikon in icon.get_image():
                 if icon.get_selected() is False:
@@ -127,7 +132,7 @@ class MainWindow(QMainWindow):
         values = list(results.values())
 
         i = 0
-        sets_labels = [self.layout.itemAt(i).widget() for i in range(17, 20)]
+        sets_labels = [self.layout.itemAt(i).widget() for i in range(12, 15)]
         for set_label in sets_labels:
             if keys[i] == "" or keys[i] == " ":
                 key_text = "EMPTY: \t\t"
@@ -159,6 +164,7 @@ if __name__ == "__main__":
     randomizer = LoadoutRandomizer()
     window = MainWindow(randomizer)
     window.setWindowTitle("Final Fantasy XVI - Loadout Randomizer")
-    window.setFixedSize(677, 450)
+    window.setWindowIcon(QIcon("./Assets/app_icon.png"))
+    window.setFixedSize(673, 503)
     window.show()
     sys.exit(app.exec())
