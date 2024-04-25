@@ -123,7 +123,7 @@ class LoadoutRandomizer():
                 ability_set[1].remove(paired_abilities[0])
                 ability_set[1].remove(paired_abilities[1])
                 self.temp_ability_dict[ability_set[0]] = ability_set[1]
-            elif (replacement is True) and (len(ability_set[1] > 0)):
+            elif (replacement is True) and (len(ability_set[1]) > 0):
                 paired_abilities = choices(list(ability_set[1]), k=2)
             elif (len(ability_set[1]) == 0):
                 paired_abilities = ["", ""]
