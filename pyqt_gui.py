@@ -1,3 +1,4 @@
+import os
 import sys
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
@@ -27,6 +28,14 @@ class MainWindow(QMainWindow):
         self.widget = QWidget()
         self.layout = QGridLayout()
         self.layout_setup()
+
+    def get_correct_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
     def init_eikons(self):
         if len(self.chosen_eikons) == 8:
@@ -71,8 +80,10 @@ class MainWindow(QMainWindow):
 
         # create images
         count = 0
+        rel_path = self.get_correct_path("./Assets/Eikon Icons/")
+        print(rel_path)
         for i in range(0, len(self.chosen_eikons)):
-            eikon_icon = PicButton("./Assets/Eikon Icons/" + self.chosen_eikons[i] + "_icon.png")
+            eikon_icon = PicButton(rel_path + self.chosen_eikons[i] + "_icon.png")
             if i <= 4:
                 self.layout.addWidget(eikon_icon, 0, count)
                 count += 1
@@ -186,7 +197,8 @@ if __name__ == "__main__":
     randomizer = LoadoutRandomizer()
     window = MainWindow(randomizer)
     window.setWindowTitle("Final Fantasy XVI - Loadout Randomizer")
-    window.setWindowIcon(QIcon("./Assets/app_icon.png"))
+    rel_path = window.get_correct_path("./Assets/")
+    window.setWindowIcon(QIcon(rel_path + "app_icon.png"))
     window.setFixedSize(673, 503)
     window.show()
     sys.exit(app.exec())
