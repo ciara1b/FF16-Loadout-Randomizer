@@ -50,8 +50,12 @@ of the repository as per usual.
 1. Loadout Randomizer contains three python classes, each in it's own
 seperate file, various image assets, and a `.txt` file containing the
 necessary *Eikon* data.
-3. Go to your preferred terminal and ```pip install PyQt6```. This is the
-only package you'll need that isn't already pre-packaged with Python 3.
+3. Go to your preferred terminal and
+```
+pip install PyQt6
+```
+This is the only package you'll need that isn't already pre-packaged
+with Python 3.
 4. Run the `pyqt_gui.py` file in the root directory in your preferred
 terminal or IDE to start the application.
 
@@ -59,8 +63,14 @@ terminal or IDE to start the application.
 
 If you want to build it yourself:
 1. Download and install the latest version of **Python 3**.
-2. ```pip install pyinstaller```
-3. ```pyinstaller pyqt_gui.spec```
+2. 
+```
+pip install pyinstaller
+```
+3. 
+```
+pyinstaller pyqt_gui.spec
+```
 4. The working executable is available in the `/dist/pyqt_gui/` directory.
 The `_internal` directory contains all the necessary files and packages, so
 always keep it in the same parent directory as the executable.
