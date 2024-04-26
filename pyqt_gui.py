@@ -29,13 +29,15 @@ class MainWindow(QMainWindow):
         self.layout = QGridLayout()
         self.layout_setup()
 
+    # method for compiled version
     def get_correct_path(self, relative_path):
         try:
-            base_path = sys._MEIPASS
+            base_path = sys._MEIPASS + "\\"
         except Exception:
             base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+            base_path = os.path.join(base_path, relative_path)
+        
+        return base_path
 
     def init_eikons(self):
         if len(self.chosen_eikons) == 8:

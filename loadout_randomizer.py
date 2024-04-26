@@ -24,15 +24,16 @@ class LoadoutRandomizer():
     # method for compiled version
     def get_correct_path(self, relative_path):
         try:
-            base_path = sys._MEIPASS
+            base_path = sys._MEIPASS + "\\"
         except Exception:
             base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+            base_path = os.path.join(base_path, relative_path)
+        
+        return base_path
         
     def fetch_eikon_details(self):
 
-        rel_path = self.get_correct_path("./")
+        rel_path = self.get_correct_path("")
         count = 1
         with open(rel_path + "feats_and_abilities.txt", "r") as f:
             lines = f.readlines()
