@@ -169,7 +169,7 @@ class MainWindow(QMainWindow):
             values = list(results.values())
 
             i = 0
-            sets_labels = (self.layout.itemAt(11).widget().findChildren(QLabel))
+            sets_labels = sample(self.layout.itemAt(11).widget().findChildren(QLabel), 3)
             for set_label in sets_labels:
                 if keys[i] == "" or keys[i] == " " or keys[i] == "EMPTY":
                     key_text = "EMPTY: \t\t"
