@@ -85,7 +85,13 @@ class LoadoutRandomizer():
                 eikon = None
             
             if 'paired_abilities' in locals():
-                loadout[feat] = paired_abilities
+                if feat == "" and feat in list(loadout.keys()):
+                    if " " in list(loadout.keys()):
+                        loadout["EMPTY"] = paired_abilities
+                    else:
+                        loadout[" "] = paired_abilities
+                else:
+                    loadout[feat] = paired_abilities
             else:
                 ability_one = self.random_ability(replacement, pair_eikon=eikon)
                 ability_two = self.random_ability(replacement, pair_eikon=eikon)
@@ -131,7 +137,13 @@ class LoadoutRandomizer():
                     ability_set = given_eikon_details
         # else if no eikon provided, provided two abilities from same random eikon if requested
         elif pair is True:
-            ability_set = choice(list(self.temp_ability_dict.items()))
+            ability_set = ["", [""]]
+            while len(ability_set[1]) < 2:
+                ability_set = choice(list(self.temp_ability_dict.items()))
+                
+                if len(self.temp_ability_dict) <= 1 and len(ability_set[1]) < 2:
+                    ability_set = ["", ["", "", "", ""]]
+                    break
             
             # check for replacement and ability sets with less than two abilities left
             if (replacement is False) and (len(ability_set[1]) > 1):

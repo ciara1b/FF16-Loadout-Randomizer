@@ -64,7 +64,7 @@ class MainWindow(QMainWindow):
         labels = ["Repeat Abilities", "Match Feats && Abilities", "Pair Abilities", "Allow No Ability", "Allow No Feat", "Exclude DLC"]
         tooltips = ["Every ability can appear more than once. If you're unlucky, this could result in every ability being the same.",
                     "Example: if one of your feats was Bahamut, it will only choose between Bahamut's abilities to be paired with \nthat feat. If the feat is empty, this will give you two completely random abilites instead.",
-                    "Regardless of the chosen feat, for each pair, selected abilities will always be from the same Eikon. This \noption will never give you an empty ability regardless of if 'Allow No Ability' is selected. \nWARNING: this option does nothing if 'Match Feats & Abilities' is also selected.",
+                    "Regardless of the chosen feat, for each pair, selected abilities will always be from the same Eikon. \nN.B. this option does nothing if 'Match Feats & Abilities' is also selected.",
                     "Check this if you want it to be possible for any given ability to be empty.",
                     "Check this if you want it to be possible for any given feat to be empty.",
                     "Eikons only available through DLC will not be considered."]
@@ -167,6 +167,7 @@ class MainWindow(QMainWindow):
                                                 self.exclusion_criteria.get("pair_abilities"))
             keys = list(results.keys())
             values = list(results.values())
+            print(results)
 
             i = 0
             sets_labels = sample(self.layout.itemAt(11).widget().findChildren(QLabel), 3)
