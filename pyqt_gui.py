@@ -160,15 +160,18 @@ class MainWindow(QMainWindow):
     
     def generate_loadout(self):
         if (self.layout.count() > 0):
-            results = self.randomizer.randomize(self.exclusion_criteria.get("replacement"), self.exclusion_criteria.get("pairing"),
-                                            self.exclusion_criteria.get("pair_abilities"))
+            if self.chosen_eikons.count("") == len(self.chosen_eikons):
+                results = {"EMPTY": ["", ""], "": ["", ""], " ": ["", ""]}
+            else:
+                results = self.randomizer.randomize(self.exclusion_criteria.get("replacement"), self.exclusion_criteria.get("pairing"),
+                                                self.exclusion_criteria.get("pair_abilities"))
             keys = list(results.keys())
             values = list(results.values())
 
             i = 0
             sets_labels = (self.layout.itemAt(11).widget().findChildren(QLabel))
             for set_label in sets_labels:
-                if keys[i] == "" or keys[i] == " ":
+                if keys[i] == "" or keys[i] == " " or keys[i] == "EMPTY":
                     key_text = "EMPTY: \t\t"
                 else:
                     key_text = keys[i] + ": \t"
@@ -189,8 +192,11 @@ class MainWindow(QMainWindow):
             return
     
     def finalize_parameters(self):
-        self.randomizer.set_parameters(self.chosen_eikons, self.exclusion_criteria.get("exclude_ability"),
-                                       self.exclusion_criteria.get("exclude_feat"), self.exclusion_criteria.get("exclude_dlc"))
+        if self.chosen_eikons.count("") == len(self.chosen_eikons):
+            pass
+        else:
+            self.randomizer.set_parameters(self.chosen_eikons, self.exclusion_criteria.get("exclude_ability"),
+                                        self.exclusion_criteria.get("exclude_feat"), self.exclusion_criteria.get("exclude_dlc"))
         self.generate_loadout()
 
 if __name__ == "__main__":
